@@ -1,0 +1,34 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model GenericMedicine {
+  id          String  @id @default(cuid())
+  genericName String  @unique
+  salt        String?
+  contents    String?
+  packing     String?
+  ptr         Float?
+  mrp         Float?
+  shipperSize Int?
+
+  @@index([salt])
+}
+
+model BrandedMedicine {
+  id          String  @id @default(cuid())
+  brandedName String  @unique
+  salt        String?
+  contents    String?
+  packing     String?
+  ptr         Float?
+  mrp         Float?
+  shipperSize Int?
+
+  @@index([salt])
+}
