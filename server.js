@@ -8,16 +8,14 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: "*",              // React Native runs on device/emulator → no origin
-    methods: ["GET", "POST"], // add PUT, DELETE if needed
+    origin: "*",              
+    methods: ["GET", "POST"], 
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 const upload = multer({ dest: "uploads/" });
 
-// ----------------------------------------------
-// Helper: extract salt from CONTENTS
-// ----------------------------------------------
+
 function extractSalt(contents) {
     if (!contents) return null;
     if (["#N/A", "N/A", "NA"].includes(contents)) return null;
@@ -33,18 +31,12 @@ function extractSalt(contents) {
     return salt || null;
 }
 
-// ----------------------------------------------
-// Helper: read XLSX file into JSON rows
-// ----------------------------------------------
-
 function readExcelSmart(filePath) {
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    // read entire sheet into array-of-arrays
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
 
-    // find header row by scanning all rows
     let headerRowIndex = rows.findIndex(row =>
         row.some(col => String(col).trim().toUpperCase() === "PRODUCT NAME")
     );
@@ -55,10 +47,8 @@ function readExcelSmart(filePath) {
 
     const header = rows[headerRowIndex].map(h => h.toString().trim());
 
-    // read ALL rows below header, not stopping at empties
     const dataRows = rows.slice(headerRowIndex + 1);
 
-    // convert to objects but keep all rows
     const parsed = dataRows.map(row => {
         let obj = {};
         header.forEach((h, idx) => {
@@ -68,7 +58,6 @@ function readExcelSmart(filePath) {
         return obj;
     });
 
-    // skip rows where entire row is empty
     return parsed.filter(r => {
         const val = r["PRODUCT NAME"]?.trim();
         return val && val !== "" && val !== null;
@@ -77,10 +66,6 @@ function readExcelSmart(filePath) {
 
 
 
-
-// ----------------------------------------------
-// 1) UPLOAD GENERIC XLSX
-// ----------------------------------------------
 app.post("/upload/generic", upload.single("file"), async (req, res) => {
     try {
         const rows = readExcelSmart(req.file.path);
