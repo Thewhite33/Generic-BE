@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Upload - Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+
+        .file-label:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .file-label.has-file {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .result.success {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            display: block;
+        }
+
+        .result.error {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .instructions {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .instructions h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #78350f;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-section {
+            margin-top: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .search-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .search-result.show {
+            display: block;
+        }
+
+        .medicine-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .medicine-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .medicine-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            font-weight: 600;
+        }
+
+        .savings {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🏥 Medicine Upload System</h1>
+            <p class="subtitle">Upload your Excel files to populate the medicine database</p>
+
+            <!-- Generic Upload -->
+            <div class="upload-section">
+                <h2 class="section-title">Upload Generic Medicines</h2>
+                <form id="genericForm">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="genericFile" name="file" class="file-input" accept=".xlsx,.xls">
+                        <label for="genericFile" class="file-label" id="genericLabel">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span id="genericFileName">Choose Excel file or drag here</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="upload-btn" id="genericBtn" disabled>
+                        Upload Generic Medicines
+                    </button>
+                </form>
+                <div id="genericResult" class="result"></div>
+            </div>
+
+            <!-- Branded Upload -->
+            <div class="upload-section">
+                <h2 class="section-title">Upload Branded Medicines</h2>
+                <form id="brandedForm">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="brandedFile" name="file" class="file-input" accept=".xlsx,.xls">
+                        <label for="brandedFile" class="file-label" id="brandedLabel">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span id="brandedFileName">Choose Excel file or drag here</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="upload-btn" id="brandedBtn" disabled>
+                        Upload Branded Medicines
+                    </button>
+                </form>
+                <div id="brandedResult" class="result"></div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <h3>📋 Excel File Requirements:</h3>
+                <ul>
+                    <li>File must contain a header row with <strong>"PRODUCT NAME"</strong> column</li>
+                    <li>Optional columns: CONTENTS, PACKING, PTR, MRP, SHIPPER SIZE</li>
+                    <li>The field name in the form must be exactly <strong>"file"</strong></li>
+                    <li>Supported formats: .xlsx, .xls</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card">
+            <h2 class="section-title">🔍 Search Medicine</h2>
+            <div class="search-section">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Search medicine name (e.g., crocin, paracetamol)">
+                <button id="searchBtn" class="search-btn">Search</button>
+                <div id="searchResult" class="search-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // Generic file upload
+        const genericFile = document.getElementById('genericFile');
+        const genericLabel = document.getElementById('genericLabel');
+        const genericFileName = document.getElementById('genericFileName');
+        const genericBtn = document.getElementById('genericBtn');
+        const genericForm = document.getElementById('genericForm');
+        const genericResult = document.getElementById('genericResult');
+
+        genericFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                genericFileName.textContent = file.name;
+                genericLabel.classList.add('has-file');
+                genericBtn.disabled = false;
+            } else {
+                genericFileName.textContent = 'Choose Excel file or drag here';
+                genericLabel.classList.remove('has-file');
+                genericBtn.disabled = true;
+            }
+        });
+
+        genericForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = genericFile.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file); // IMPORTANT: field name must be 'file'
+
+            genericBtn.innerHTML = '<span class="spinner"></span>Uploading...';
+            genericBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/upload/generic`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    genericResult.className = 'result success';
+                    genericResult.innerHTML = `
+                        <strong>✅ ${data.message}</strong>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Created</div>
+                                <div class="stat-value">${data.stats.created}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Updated</div>
+                                <div class="stat-value">${data.stats.updated}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Total</div>
+                                <div class="stat-value">${data.stats.total}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    genericResult.className = 'result error';
+                    genericResult.innerHTML = `<strong>❌ Error:</strong> ${data.error || data.message}`;
+                }
+            } catch (error) {
+                genericResult.className = 'result error';
+                genericResult.innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+            } finally {
+                genericBtn.innerHTML = 'Upload Generic Medicines';
+                genericBtn.disabled = false;
+            }
+        });
+
+        // Branded file upload
+        const brandedFile = document.getElementById('brandedFile');
+        const brandedLabel = document.getElementById('brandedLabel');
+        const brandedFileName = document.getElementById('brandedFileName');
+        const brandedBtn = document.getElementById('brandedBtn');
+        const brandedForm = document.getElementById('brandedForm');
+        const brandedResult = document.getElementById('brandedResult');
+
+        brandedFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                brandedFileName.textContent = file.name;
+                brandedLabel.classList.add('has-file');
+                brandedBtn.disabled = false;
+            } else {
+                brandedFileName.textContent = 'Choose Excel file or drag here';
+                brandedLabel.classList.remove('has-file');
+                brandedBtn.disabled = true;
+            }
+        });
+
+        brandedForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = brandedFile.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file); // IMPORTANT: field name must be 'file'
+
+            brandedBtn.innerHTML = '<span class="spinner"></span>Uploading...';
+            brandedBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/upload/branded`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    brandedResult.className = 'result success';
+                    brandedResult.innerHTML = `
+                        <strong>✅ ${data.message}</strong>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Created</div>
+                                <div class="stat-value">${data.stats.created}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Updated</div>
+                                <div class="stat-value">${data.stats.updated}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Total</div>
+                                <div class="stat-value">${data.stats.total}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    brandedResult.className = 'result error';
+                    brandedResult.innerHTML = `<strong>❌ Error:</strong> ${data.error || data.message}`;
+                }
+            } catch (error) {
+                brandedResult.className = 'result error';
+                brandedResult.innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+            } finally {
+                brandedBtn.innerHTML = 'Upload Branded Medicines';
+                brandedBtn.disabled = false;
+            }
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchResult = document.getElementById('searchResult');
+
+        searchBtn.addEventListener('click', async () => {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            searchBtn.innerHTML = '<span class="spinner"></span>Searching...';
+            searchBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/search/branded?name=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    searchResult.className = 'search-result show';
+                    
+                    let html = `
+                        <div class="medicine-card">
+                            <div class="medicine-name">${data.branded.name}</div>
+                            <div class="medicine-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Salt:</span>
+                                    <span>${data.branded.salt || 'N/A'}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Type:</span>
+                                    <span>${data.branded.type || 'N/A'}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">PTR:</span>
+                                    <span>₹${data.branded.ptr || 'N/A'}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">MRP:</span>
+                                    <span>₹${data.branded.mrp || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (data.generics && data.generics.length > 0) {
+                        html += '<h3 style="margin-top: 20px; color: #667eea;">Generic Alternatives:</h3>';
+                        data.generics.forEach(generic => {
+                            html += `
+                                <div class="medicine-card">
+                                    <div class="medicine-name">
+                                        ${generic.name}
+                                        ${generic.savings ? `<span class="savings">Save ${generic.savings}</span>` : ''}
+                                    </div>
+                                    <div class="medicine-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">PTR:</span>
+                                            <span>₹${generic.ptr || 'N/A'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">MRP:</span>
+                                            <span>₹${generic.mrp || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    searchResult.innerHTML = html;
+                } else {
+                    searchResult.className = 'search-result show';
+                    searchResult.innerHTML = `
+                        <div style="color: #991b1b; padding: 20px; text-align: center;">
+                            <strong>❌ ${data.error}</strong>
+                            ${data.suggestion ? `<p style="margin-top: 10px; color: #666;">${data.suggestion}</p>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                searchResult.className = 'search-result show';
+                searchResult.innerHTML = `
+                    <div style="color: #991b1b; padding: 20px; text-align: center;">
+                        <strong>❌ Error: ${error.message}</strong>
+                    </div>
+                `;
+            } finally {
+                searchBtn.innerHTML = 'Search';
+                searchBtn.disabled = false;
+            }
+        });
+
+        // Allow search on Enter key
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

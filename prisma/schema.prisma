@@ -12,6 +12,7 @@ model GenericMedicine {
   genericName String  @unique
   salt        String?
   contents    String?
+  type        String?
   packing     String?
   ptr         Float?
   mrp         Float?
@@ -25,6 +26,7 @@ model BrandedMedicine {
   brandedName String  @unique
   salt        String?
   contents    String?
+  type        String?
   packing     String?
   ptr         Float?
   mrp         Float?
